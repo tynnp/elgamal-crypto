@@ -1,49 +1,30 @@
-import os
-from ElGamal_algorithm import generate_keys, encrypt
+from ElGamal_algorithm import *
 
-input_file = input("Nhập đường dẫn file cần mã hóa: ").strip()
-base, ext = os.path.splitext(input_file)
-
-with open(input_file, 'rb') as f:
-    plaintext = f.read()
-
-plaintext_file = "plaintext.txt"
-with open(plaintext_file, 'w') as f:
-    f.write(" ".join(map(str, plaintext)))
-print(f"Bản rõ đã được lưu tại: {plaintext_file}")
-
-p, alpha, beta, a = generate_keys(min_prime=10000, max_prime=70000)
-
-# In thông tin khóa
+# Lấy nội dung file cần mã hóa
 print("-" * 100)
-print("Thông tin mã hóa:")
-print(f"p = {p}")
-print(f"alpha = {alpha}")
-print(f"beta = {beta}")
-print(f"a = {a}")
-print(f"-> Khóa công khai: ({p}, {alpha}, {beta})")
-print(f"-> Khóa bí mật: ({a})")
+file_path = input("Nhập đường dẫn đến file cần mã hóa: ")
+with open(file_path, "rb") as f:
+    file_bytes = f.read()
+plaintext_int = list(file_bytes)
 
-info = {
-    "p": p,
-    "alpha": alpha,
-    "beta": beta,
-    "a": a,
-    "ext": ext
+# Lấy nội dung khóa công khai
+pub_file = "public_key.json"
+with open(pub_file, "r") as f:
+    public_key = json.load(f)
+
+p = public_key["p"]
+alpha = public_key["alpha"]
+beta = public_key["beta"]
+
+# Thực hiện mã hóa và tạo thông điệp
+ciphertext = encrypt(plaintext_int, p, alpha, beta)
+message = {
+    "filename": os.path.basename(file_path),
+    "ciphertext": ciphertext
 }
 
-with open("info.txt", 'w') as f:
-    for k, v in info.items():
-        f.write(f"{k}:{v}\n")
-print("Thông tin khóa và phần mở rộng file được lưu tại info.txt")
-
-# Thực hiện mã hóa
-plaintext = list(plaintext)
-ciphertext = encrypt(plaintext, p, alpha, beta)
-
-# Lưu ciphertext ra file 
-ciphertext_file = "ciphertext.txt"
-with open(ciphertext_file, 'w') as f:
-    f.write(" ".join(map(str, ciphertext)))
-print(f"Bản mã đã được lưu tại: {ciphertext_file}")
-print("-" * 100)
+# Ghi lại thông điệp đã được mã hóa
+message_file = "message.json"
+with open(message_file, "w") as f:
+    json.dump(message, f, separators=(',', ': '))
+print(f"file thông điệp được lưu tại {message_file}", "-" * 100, sep='\n')

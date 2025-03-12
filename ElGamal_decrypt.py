@@ -1,25 +1,28 @@
 from ElGamal_algorithm import *
 
-ciphertext_file = "ciphertext.txt"
-with open(ciphertext_file, 'r') as f:
-    data = f.read().strip()
-ciphertext = list(map(int, data.split()))
+# Lấy nội dung thông điệp 
+print("-" * 100)
+message_file = input("Nhập đường dẫn đến file thông điệp: ")
+with open(message_file, "r") as f:
+    message = json.load(f)
 
-info = {}
-with open("info.txt", 'r') as f:
-    for line in f:
-        if line.strip():
-            k, v = line.split(':')
-            info[k.strip()] = v.strip()
+ciphertext = message["ciphertext"]
+filename = message["filename"]
 
-p = int(info["p"])
-a = int(info["a"])
-ext = info["ext"]
+# Lấy nội dung khóa bí mật
+priv_file = "private_key.json"
+with open(priv_file, "r") as f:
+    private_key = json.load(f)
 
-decrypted = decrypt(ciphertext, p, a)
-decrypted_data = bytes(decrypted)
+p = private_key["p"]
+a = private_key["a"]
 
-decrypted_file = "decrypted" + ext
-with open(decrypted_file, 'wb') as f:
-    f.write(decrypted_data)
-print(f"File đã giải mã đã được lưu tại: {decrypted_file}")
+# Thực hiện giải mã và chuyển về bytes
+decrypted_int = decrypt(ciphertext, p, a)
+file_bytes = bytes(decrypted_int)
+
+# Lưu lại file đã giải mã
+out_file = "decrypted_" + filename
+with open(out_file, "wb") as f:
+    f.write(file_bytes)
+print(f"file đã được giải mã và lưu tại {out_file}", "-" * 100, sep='\n')
