@@ -19,10 +19,10 @@ a = private_key["a"]
 
 # Thực hiện giải mã và chuyển về bytes
 decrypted_int = decrypt(ciphertext, p, a)
-file_bytes = bytes(decrypted_int)
+plaintext_bytes = bytes(decrypted_int)
 
 # Lưu lại file đã giải mã
 out_file = "decrypted_" + filename
 with open(out_file, "wb") as f:
-    f.write(file_bytes)
+    f.write(plaintext_bytes)
 print(f"file đã được giải mã và lưu tại {out_file}", "-" * 100, sep='\n')
